@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AANGONFIELD Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{font-family:'Poppins',sans-serif;margin:0;background:#f2f2f2;color:#111}
+
+header{background:linear-gradient(135deg,#111,#2b2b2b);color:white;padding:30px 20px;text-align:center}
+header h1{margin:0;font-size:28px}
+header p{color:#ccc;font-size:14px}
+
+.search-area{background:white;padding:15px;text-align:center}
+.search-area input{width:95%;max-width:450px;padding:12px;border-radius:10px;border:1px solid #ddd}
+
+.container{padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px}
+
+.card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 6px 14px rgba(0,0,0,0.08)}
+.card img{width:100%;height:170px;object-fit:cover}
+.card-body{padding:12px}
+
+.number{font-size:11px;color:#777}
+.title{font-size:14px;font-weight:600;margin:6px 0}
+
+.btn{display:block;text-align:center;background:black;color:white;padding:8px;border-radius:6px;text-decoration:none;font-size:12px}
+
+</style>
+</head>
+<body>
+
+<header>
+<h1>AANGONFIELD 🔥</h1>
+<p>Rekomendasi Barang Bagus & Worth It</p>
+</header>
+
+<div class="search-area">
+<input type="text" id="search" placeholder="Cari nomor / nama produk..." onkeyup="searchProduct()">
+</div>
+
+<div class="container">
+<div class="grid" id="productGrid"></div>
+</div>
+
+<script>
+
+// GANTI DENGAN LINK CSV GOOGLE SHEETS
+const sheetURL = "PASTE_LINK_SPREADSHEET_DISINI";
+
+let allProducts = [];
+
+fetch(sheetURL)
+.then(res => res.text())
+.then(csv => {
+
+const rows = csv.split("\n").slice(1);
+
+rows.forEach(row => {
+
+const cols = row.split(",");
+
+if(cols.length < 5) return;
+
+const product = {
+number: cols[0],
+name: cols[1],
+category: cols[2],
+image: cols[3],
+tiktok: cols[4],
+shopee: cols[5]
+};
+
+allProducts.push(product);
+
+});
+
+renderProducts(allProducts);
+
+});
+
+function renderProducts(products){
+
+const grid = document.getElementById("productGrid");
+grid.innerHTML = "";
+
+products.forEach(p=>{
+
+if(!p.number) return;
+
+const card = document.createElement("div");
+card.className="card";
+
+card.innerHTML=`
+<img src="${p.image || 'https://via.placeholder.com/300'}">
+<div class="card-body">
+<div class="number">No.${p.number}</div>
+<div class="title">${p.name}</div>
+<a class="btn" href="${p.tiktok}" target="_blank">Beli di TikTok</a>
+</div>
+`;
+
+grid.appendChild(card);
+
+});
+
+}
+
+function searchProduct(){
+
+let input=document.getElementById('search').value.toLowerCase();
+
+const filtered = allProducts.filter(p=>
+p.number.includes(input) || (p.name && p.name.toLowerCase().includes(input))
+);
+
+renderProducts(filtered);
+
+}
+
+</script>
+
+</body>
+</html>
